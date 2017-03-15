@@ -57,7 +57,9 @@ docs/_build/
 # PyBuilder
 target/
 
-# Model weights
+# Project specific
 discriminator
 generator
+assets
+.vscode
 

@@ -1,3 +1,5 @@
+import argparse
+import math
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import Reshape
@@ -10,18 +12,17 @@ from keras.optimizers import SGD
 from keras.datasets import mnist
 import numpy as np
 from PIL import Image
-import argparse
-import math
+import ck
 
 
 def generator_model():
     model = Sequential()
     model.add(Dense(input_dim=100, output_dim=1024))
     model.add(Activation('tanh'))
-    model.add(Dense(128*7*7))
+    model.add(Dense(128*16*16))
     model.add(BatchNormalization())
     model.add(Activation('tanh'))
-    model.add(Reshape((128, 7, 7), input_shape=(128*7*7,)))
+    model.add(Reshape((128, 16, 16), input_shape=(128*16*16,)))
     model.add(UpSampling2D(size=(2, 2)))
     model.add(Convolution2D(64, 5, 5, border_mode='same'))
     model.add(Activation('tanh'))
@@ -36,7 +37,7 @@ def discriminator_model():
     model.add(Convolution2D(
                         64, 5, 5,
                         border_mode='same',
-                        input_shape=(1, 28, 28)))
+                        input_shape=(1, 64, 64)))
     model.add(Activation('tanh'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Convolution2D(128, 5, 5))
@@ -74,7 +75,7 @@ def combine_images(generated_images):
 
 
 def train(BATCH_SIZE):
-    (X_train, y_train), (X_test, y_test) = mnist.load_data()
+    (X_train, y_train), (X_test, y_test) = ck.load_data()
     X_train = (X_train.astype(np.float32) - 127.5)/127.5
     X_train = X_train.reshape((X_train.shape[0], 1) + X_train.shape[1:])
     discriminator = discriminator_model()
